@@ -62,7 +62,7 @@ export function CandidateForm({ initialData, availableTags, onSubmit, onCancel }
                             { value: 'chatting', label: 'Chatting', color: '#8B5CF6' },
                             { value: 'met once', label: 'Met Once', color: '#F59E0B' },
                             { value: 'on hold', label: 'On Hold', color: '#6B7280' },
-                            { value: 'ended', label: 'Ended', color: '#EF4444' },
+                            { value: 'ended', label: 'Ended', color: '#64748B' },
                         ]}
                     />
                 </div>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { type Candidate } from '../types';
 import { Card } from './Card';
 import { Badge } from './Badge';
@@ -21,14 +20,14 @@ export function CandidateCard({ candidate, onClick, onDelete }: CandidateCardPro
                                 width: '56px',
                                 height: '56px',
                                 borderRadius: '16px',
-                                background: 'linear-gradient(135deg, #F43F5E 0%, #FDA4AF 100%)',
+                                background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 fontSize: '1.5rem',
                                 fontWeight: 'bold',
                                 color: 'white',
-                                boxShadow: '0 4px 10px rgba(244, 63, 94, 0.2)'
+                                boxShadow: '0 4px 10px rgba(92, 138, 114, 0.2)'
                             }}
                         >
                             {candidate.name.charAt(0)}
@@ -71,7 +70,7 @@ export function CandidateCard({ candidate, onClick, onDelete }: CandidateCardPro
                                 e.stopPropagation();
                                 onDelete(candidate.id);
                             }}
-                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors"
                             title="Delete candidate"
                         >
                             <Trash2 size={16} />
@@ -89,7 +88,7 @@ function getStatusColor(status: string): string {
         case 'chatting': return '#8B5CF6'; // Purple
         case 'met once': return '#F59E0B'; // Amber
         case 'on hold': return '#6B7280'; // Gray
-        case 'ended': return '#EF4444'; // Red
+        case 'ended': return '#64748B'; // Slate
         default: return '#6B7280';
     }
 }

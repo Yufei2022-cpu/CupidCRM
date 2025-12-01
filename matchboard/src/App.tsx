@@ -57,7 +57,7 @@ function App() {
           <h1 className="font-bold text-2xl mb-4">Settings</h1>
           <p className="text-muted">Settings functionality coming soon.</p>
           <button
-            className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            className="mt-4 px-4 py-2 bg-slate-600 text-white rounded hover:bg-slate-700"
             onClick={() => {
               if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
                 localStorage.removeItem('matchboard_data');

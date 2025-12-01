@@ -19,7 +19,7 @@ export function CandidateDetail({ candidateId, onBack }: CandidateDetailProps) {
     const notes = data.notes.filter(n => n.candidateId === candidateId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     const interactions = data.interactions.filter(i => i.candidateId === candidateId).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-    const [activeTab, setActiveTab] = useState<'overview' | 'interactions' | 'notes'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'interactions' | 'notes' | 'tags'>('overview');
     const [newNote, setNewNote] = useState('');
 
     // Interaction Form State
@@ -59,7 +59,7 @@ export function CandidateDetail({ candidateId, onBack }: CandidateDetailProps) {
                 <Button variant="ghost" onClick={onBack} className="gap-2 pl-0 hover:pl-2 transition-all">
                     <ArrowLeft size={18} /> Back to Dashboard
                 </Button>
-                <Button variant="ghost" onClick={handleDelete} className="text-red-500 hover:bg-red-50 hover:text-red-600">
+                <Button variant="ghost" onClick={handleDelete} className="text-slate-500 hover:bg-slate-50 hover:text-slate-700">
                     <Trash2 size={18} className="mr-2" /> Delete Candidate
                 </Button>
             </div>
@@ -71,14 +71,14 @@ export function CandidateDetail({ candidateId, onBack }: CandidateDetailProps) {
                         width: '120px',
                         height: '120px',
                         borderRadius: '24px',
-                        background: 'linear-gradient(135deg, #F43F5E 0%, #FDA4AF 100%)',
+                        background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         fontSize: '3rem',
                         fontWeight: 'bold',
                         color: 'white',
-                        boxShadow: '0 10px 25px -5px rgba(244, 63, 94, 0.4)',
+                        boxShadow: '0 10px 25px -5px rgba(92, 138, 114, 0.4)',
                         flexShrink: 0
                     }}
                 >
@@ -103,7 +103,7 @@ export function CandidateDetail({ candidateId, onBack }: CandidateDetailProps) {
                                     { value: 'chatting', label: 'Chatting', color: '#8B5CF6' },
                                     { value: 'met once', label: 'Met Once', color: '#F59E0B' },
                                     { value: 'on hold', label: 'On Hold', color: '#6B7280' },
-                                    { value: 'ended', label: 'Ended', color: '#EF4444' },
+                                    { value: 'ended', label: 'Ended', color: '#64748B' },
                                 ]}
                                 className="w-40"
                             />
@@ -127,7 +127,7 @@ export function CandidateDetail({ candidateId, onBack }: CandidateDetailProps) {
                 >
                     Overview
                     {activeTab === 'overview' && (
-                        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-rose-500 rounded-t-full" style={{ backgroundColor: 'var(--primary)' }} />
+                        <div className="absolute bottom-0 left-0 w-full h-0.5 rounded-t-full" style={{ backgroundColor: 'var(--primary)' }} />
                     )}
                 </button>
                 <button
@@ -136,7 +136,7 @@ export function CandidateDetail({ candidateId, onBack }: CandidateDetailProps) {
                 >
                     Interactions
                     {activeTab === 'interactions' && (
-                        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-rose-500 rounded-t-full" style={{ backgroundColor: 'var(--primary)' }} />
+                        <div className="absolute bottom-0 left-0 w-full h-0.5 rounded-t-full" style={{ backgroundColor: 'var(--primary)' }} />
                     )}
                 </button>
                 <button
@@ -145,7 +145,16 @@ export function CandidateDetail({ candidateId, onBack }: CandidateDetailProps) {
                 >
                     Notes
                     {activeTab === 'notes' && (
-                        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-rose-500 rounded-t-full" style={{ backgroundColor: 'var(--primary)' }} />
+                        <div className="absolute bottom-0 left-0 w-full h-0.5 rounded-t-full" style={{ backgroundColor: 'var(--primary)' }} />
+                    )}
+                </button>
+                <button
+                    className={`pb-4 font-bold text-lg transition-all relative ${activeTab === 'tags' ? 'text-primary' : 'text-muted'}`}
+                    onClick={() => setActiveTab('tags')}
+                >
+                    Tags
+                    {activeTab === 'tags' && (
+                        <div className="absolute bottom-0 left-0 w-full h-0.5 rounded-t-full" style={{ backgroundColor: 'var(--primary)' }} />
                     )}
                 </button>
             </div>
@@ -238,6 +247,40 @@ export function CandidateDetail({ candidateId, onBack }: CandidateDetailProps) {
                             ))}
                             {notes.length === 0 && <p className="text-muted italic">No notes yet.</p>}
                         </div>
+                    </div>
+                )}
+
+                {activeTab === 'tags' && (
+                    <div className="flex flex-col gap-6">
+                        <Card className="p-8">
+                            <h3 className="font-bold text-xl mb-6">Manage Tags</h3>
+                            <div className="flex flex-wrap gap-3">
+                                {data.tags.map(tag => {
+                                    const isSelected = candidate.tags.some(t => t.id === tag.id);
+                                    return (
+                                        <button
+                                            key={tag.id}
+                                            onClick={() => {
+                                                const newTags = isSelected
+                                                    ? candidate.tags.filter(t => t.id !== tag.id)
+                                                    : [...candidate.tags, tag];
+                                                updateCandidate(candidate.id, { tags: newTags });
+                                            }}
+                                            className="transition-all duration-200 hover:scale-105"
+                                            style={{ opacity: isSelected ? 1 : 0.5 }}
+                                        >
+                                            <Badge
+                                                color={tag.color}
+                                                variant={isSelected ? 'solid' : 'outline'}
+                                                className="text-lg py-2 px-4 cursor-pointer"
+                                            >
+                                                {tag.label}
+                                            </Badge>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </Card>
                     </div>
                 )}
             </div>

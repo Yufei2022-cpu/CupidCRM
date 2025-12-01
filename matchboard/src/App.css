@@ -1,11 +1,12 @@
 :root {
   /* Premium Color Palette */
-  --primary: #F43F5E;
-  /* Rose 500 */
-  --primary-hover: #E11D48;
-  /* Rose 600 */
-  --primary-light: #FFF1F2;
-  /* Rose 50 */
+  --primary: #7ab095;
+  /* Lighter Sage Green */
+  --primary-hover: #65967e;
+  /* Lighter Dark Sage */
+  --primary-light: #dff0e4;
+  /* Even Lighter Sage */
+  --primary-dark: #2f4f4f;
 
   --bg-app: #F8FAFC;
   /* Slate 50 */

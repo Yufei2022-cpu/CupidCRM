@@ -16,7 +16,7 @@ const COLUMNS = [
     { id: 'chatting', label: 'Chatting', color: '#8B5CF6' },
     { id: 'met once', label: 'Met Once', color: '#F59E0B' },
     { id: 'on hold', label: 'On Hold', color: '#6B7280' },
-    { id: 'ended', label: 'Ended', color: '#EF4444' },
+    { id: 'ended', label: 'Ended', color: '#64748B' },
 ];
 
 export function Overview({ onCandidateClick }: OverviewProps) {
@@ -39,7 +39,7 @@ export function Overview({ onCandidateClick }: OverviewProps) {
 
         // Title
         doc.setFontSize(20);
-        doc.setTextColor(225, 29, 72); // Rose-600
+        doc.setTextColor(92, 138, 114); // Sage Green #5c8a72
         doc.text('MatchBoard Report', 14, 22);
 
         doc.setFontSize(10);
@@ -61,8 +61,8 @@ export function Overview({ onCandidateClick }: OverviewProps) {
             body: tableData,
             startY: 40,
             styles: { fontSize: 9 },
-            headStyles: { fillColor: [225, 29, 72] }, // Rose-600
-            alternateRowStyles: { fillColor: [255, 241, 242] }, // Rose-50
+            headStyles: { fillColor: [92, 138, 114] }, // Sage Green
+            alternateRowStyles: { fillColor: [248, 250, 252] }, // Slate-50
         });
 
         doc.save(`matchboard_report_${new Date().toISOString().split('T')[0]}.pdf`);
@@ -71,9 +71,9 @@ export function Overview({ onCandidateClick }: OverviewProps) {
     return (
         <div className="p-8 h-full flex flex-col gap-6 animate-fade-in overflow-hidden">
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-indigo-50" style={{ backgroundColor: '#EEF2FF' }}>
-                        <ScrollText size={24} className="text-indigo-500" />
+                <div className="flex items-center gap-8">
+                    <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--primary-light)' }}>
+                        <ScrollText size={24} style={{ color: 'var(--primary)' }} />
                     </div>
                     <div>
                         <h1 className="font-bold tracking-tight" style={{ fontSize: '2rem', color: 'var(--text-main)' }}>Overview</h1>
@@ -97,7 +97,7 @@ export function Overview({ onCandidateClick }: OverviewProps) {
                     const candidates = data.candidates.filter(c => c.status === column.id);
 
                     return (
-                        <div key={column.id} className="flex-shrink-0 w-80 flex flex-col gap-4">
+                        <div key={column.id} className="flex-1 min-w-[300px] flex flex-col gap-4">
                             <div className="flex items-center justify-between p-3 rounded-lg bg-white border border-slate-200 shadow-sm">
                                 <span className="font-bold text-slate-700">{column.label}</span>
                                 <Badge color={column.color} variant="solid">{candidates.length}</Badge>
