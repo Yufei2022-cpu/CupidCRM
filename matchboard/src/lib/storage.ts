@@ -10,6 +10,13 @@ const INITIAL_TAGS: Tag[] = [
   { id: '3', label: 'Introvert', color: '#93C5FD' }, // blue
   { id: '4', label: 'Extrovert', color: '#F87171' }, // red
   { id: '5', label: 'Ambitious', color: '#C4B5FD' }, // purple
+  { id: '6', label: 'Long-term', color: '#0EA5E9' }, // sky blue
+  { id: '7', label: 'Casual', color: '#EC4899' }, // pink
+  { id: '8', label: 'Traveler', color: '#F97316' }, // orange
+  { id: '9', label: 'Foodie', color: '#EF4444' }, // red
+  { id: '10', label: 'Artistic', color: '#8B5CF6' }, // violet
+  { id: '11', label: 'Academic', color: '#6366F1' }, // indigo
+  { id: '12', label: 'Pet Lover', color: '#10B981' }, // emerald
 ];
 
 const MOCK_CANDIDATES: Candidate[] = [
@@ -21,7 +28,7 @@ const MOCK_CANDIDATES: Candidate[] = [
     city: 'Munich',
     job: 'UX Designer',
     status: 'chatting',
-    tags: [INITIAL_TAGS[0], INITIAL_TAGS[2]],
+    tags: [INITIAL_TAGS[0], INITIAL_TAGS[2], INITIAL_TAGS[5]],
     notesSummary: 'Loves hiking and coffee.',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -34,7 +41,7 @@ const MOCK_CANDIDATES: Candidate[] = [
     city: 'Berlin',
     job: 'Software Engineer',
     status: 'met once',
-    tags: [INITIAL_TAGS[1], INITIAL_TAGS[4]],
+    tags: [INITIAL_TAGS[1], INITIAL_TAGS[4], INITIAL_TAGS[7]],
     notesSummary: 'Very polite, good conversation about tech.',
     createdAt: new Date(Date.now() - 86400000).toISOString(),
     updatedAt: new Date().toISOString(),
@@ -67,8 +74,15 @@ export function loadData(): AppData {
           : [],
         notes: Array.isArray(parsedData.notes) ? parsedData.notes : [],
         interactions: Array.isArray(parsedData.interactions) ? parsedData.interactions : [],
-        tags: Array.isArray(parsedData.tags) ? parsedData.tags : INITIAL_TAGS,
+        tags: Array.isArray(parsedData.tags) ? [...parsedData.tags] : [...INITIAL_TAGS],
       };
+
+      // Ensure all initial tags are present (merge logic)
+      INITIAL_TAGS.forEach(initialTag => {
+        if (!sanitizedData.tags.some(t => t.label === initialTag.label)) {
+          sanitizedData.tags.push(initialTag);
+        }
+      });
 
       return sanitizedData;
     }

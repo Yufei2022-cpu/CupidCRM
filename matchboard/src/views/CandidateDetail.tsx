@@ -5,13 +5,19 @@ import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
 import { TextArea } from '../components/Input';
 import { Select } from '../components/Select';
-import { ArrowLeft, MapPin, Briefcase, Trash2, StickyNote } from 'lucide-react';
+import { ArrowLeft, MapPin, Briefcase, Trash2, StickyNote, MessageSquare, Phone, Calendar, Clock } from 'lucide-react';
 import { formatDate, formatDateTime } from '../lib/utils';
 
 interface CandidateDetailProps {
     candidateId: string;
     onBack: () => void;
 }
+
+const INTERACTION_ICONS: Record<string, React.FC<{ size?: number; style?: React.CSSProperties }>> = {
+    call: Phone,
+    date: Calendar,
+    chat: MessageSquare,
+};
 
 export function CandidateDetail({ candidateId, onBack }: CandidateDetailProps) {
     const { data, addNote, addInteraction, updateCandidate, deleteCandidate } = useStore();
@@ -21,13 +27,11 @@ export function CandidateDetail({ candidateId, onBack }: CandidateDetailProps) {
 
     const [activeTab, setActiveTab] = useState<'overview' | 'interactions' | 'notes' | 'tags'>('overview');
     const [newNote, setNewNote] = useState('');
-
-    // Interaction Form State
     const [interactionType, setInteractionType] = useState<'call' | 'date' | 'chat'>('chat');
     const [interactionSummary, setInteractionSummary] = useState('');
     const [interactionDate, setInteractionDate] = useState(new Date().toISOString().slice(0, 16));
 
-    if (!candidate) return <div>Candidate not found</div>;
+    if (!candidate) return <div className="p-8 text-muted">Candidate not found</div>;
 
     const handleAddNote = () => {
         if (!newNote.trim()) return;
@@ -53,45 +57,68 @@ export function CandidateDetail({ candidateId, onBack }: CandidateDetailProps) {
         }
     };
 
+    const tabs = [
+        { id: 'overview' as const, label: 'Overview' },
+        { id: 'interactions' as const, label: `Interactions (${interactions.length})` },
+        { id: 'notes' as const, label: `Notes (${notes.length})` },
+        { id: 'tags' as const, label: 'Tags' },
+    ];
+
     return (
-        <div className="p-8 flex flex-col gap-8 max-w-5xl mx-auto animate-fade-in">
+        <div className="p-8 flex flex-col gap-6 animate-fade-in" style={{ maxWidth: '960px', margin: '0 auto' }}>
+            {/* Top Actions */}
             <div className="flex justify-between items-center">
-                <Button variant="ghost" onClick={onBack} className="gap-2 pl-0 hover:pl-2 transition-all">
-                    <ArrowLeft size={18} /> Back to Dashboard
+                <Button variant="ghost" onClick={onBack} className="gap-2">
+                    <ArrowLeft size={18} /> Back
                 </Button>
-                <Button variant="ghost" onClick={handleDelete} className="text-slate-500 hover:bg-slate-50 hover:text-slate-700">
-                    <Trash2 size={18} className="mr-2" /> Delete Candidate
+                <Button variant="danger" onClick={handleDelete} className="gap-2">
+                    <Trash2 size={16} /> Delete
                 </Button>
             </div>
 
-            {/* Header Profile */}
-            <Card className="flex flex-col md:flex-row gap-8 items-start p-8">
-                <div
-                    style={{
-                        width: '120px',
-                        height: '120px',
-                        borderRadius: '24px',
-                        background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '3rem',
-                        fontWeight: 'bold',
-                        color: 'white',
-                        boxShadow: '0 10px 25px -5px rgba(92, 138, 114, 0.4)',
-                        flexShrink: 0
-                    }}
-                >
-                    {candidate.name.charAt(0)}
-                </div>
+            {/* Profile Header with gradient banner */}
+            <div style={{
+                borderRadius: 'var(--radius-xl)',
+                overflow: 'hidden',
+                border: '1px solid var(--border)',
+                boxShadow: 'var(--shadow-md)',
+                backgroundColor: 'var(--bg-card)',
+            }}>
+                {/* Gradient Banner */}
+                <div style={{
+                    height: '100px',
+                    background: 'linear-gradient(135deg, var(--primary) 0%, #a3d4b8 50%, var(--primary-light) 100%)',
+                }} />
 
-                <div className="flex-1 w-full">
-                    <div className="flex justify-between items-start flex-wrap gap-4">
-                        <div>
-                            <h1 className="font-bold tracking-tight" style={{ fontSize: '2.5rem', lineHeight: 1.1 }}>{candidate.name}, {candidate.age}</h1>
-                            <div className="flex items-center gap-6 text-muted mt-3 text-lg">
-                                <span className="flex items-center gap-2"><MapPin size={18} /> {candidate.city}</span>
-                                <span className="flex items-center gap-2"><Briefcase size={18} /> {candidate.job}</span>
+                {/* Profile Content (shifted up) */}
+                <div style={{ padding: '0 2rem 2rem', marginTop: '-48px', position: 'relative', zIndex: 10 }}>
+                    <div className="flex gap-6 items-end" style={{ marginBottom: '1.25rem' }}>
+                        <div
+                            style={{
+                                width: '96px',
+                                height: '96px',
+                                borderRadius: '24px',
+                                background: 'white',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '2.5rem',
+                                fontWeight: 'bold',
+                                color: 'var(--primary)',
+                                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.08)',
+                                flexShrink: 0,
+                                border: '4px solid var(--bg-card)',
+                            }}
+                        >
+                            {candidate.name.charAt(0)}
+                        </div>
+                        <div style={{ flex: 1, paddingBottom: '0.25rem' }}>
+                            <h1 className="font-bold tracking-tight" style={{ fontSize: '2.25rem', lineHeight: 1.1, color: 'var(--text-main)' }}>
+                                {candidate.name}, {candidate.age}
+                            </h1>
+                            <div className="flex items-center gap-5 text-muted" style={{ marginTop: '0.5rem', fontSize: '0.95rem', fontWeight: 500 }}>
+                                <span className="flex items-center gap-1"><MapPin size={15} /> {candidate.city}</span>
+                                <span className="flex items-center gap-1"><Briefcase size={15} /> {candidate.job}</span>
                             </div>
                         </div>
                         <div className="flex flex-col items-end gap-2">
@@ -105,94 +132,74 @@ export function CandidateDetail({ candidateId, onBack }: CandidateDetailProps) {
                                     { value: 'on hold', label: 'On Hold', color: '#6B7280' },
                                     { value: 'ended', label: 'Ended', color: '#64748B' },
                                 ]}
-                                className="w-40"
+                                className="w-full"
                             />
-                            <span className="text-xs text-muted font-medium">Added {formatDate(candidate.createdAt)}</span>
+                            <span className="text-xs text-muted font-medium" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                                <Clock size={12} /> Added {formatDate(candidate.createdAt)}
+                            </span>
                         </div>
                     </div>
 
-                    <div className="flex gap-2 mt-6 flex-wrap">
-                        {candidate.tags.map(tag => (
-                            <Badge key={tag.id} color={tag.color} variant="solid">{tag.label}</Badge>
-                        ))}
-                    </div>
+                    {candidate.tags.length > 0 && (
+                        <div className="flex gap-2 flex-wrap">
+                            {candidate.tags.map(tag => (
+                                <Badge key={tag.id} color={tag.color} variant="solid" size="md">{tag.label}</Badge>
+                            ))}
+                        </div>
+                    )}
                 </div>
-            </Card>
+            </div>
 
             {/* Tabs */}
-            <div className="flex border-b gap-8" style={{ borderColor: 'var(--border)' }}>
-                <button
-                    className={`pb-4 font-bold text-lg transition-all relative ${activeTab === 'overview' ? 'text-primary' : 'text-muted'}`}
-                    onClick={() => setActiveTab('overview')}
-                >
-                    Overview
-                    {activeTab === 'overview' && (
-                        <div className="absolute bottom-0 left-0 w-full h-0.5 rounded-t-full" style={{ backgroundColor: 'var(--primary)' }} />
-                    )}
-                </button>
-                <button
-                    className={`pb-4 font-bold text-lg transition-all relative ${activeTab === 'interactions' ? 'text-primary' : 'text-muted'}`}
-                    onClick={() => setActiveTab('interactions')}
-                >
-                    Interactions
-                    {activeTab === 'interactions' && (
-                        <div className="absolute bottom-0 left-0 w-full h-0.5 rounded-t-full" style={{ backgroundColor: 'var(--primary)' }} />
-                    )}
-                </button>
-                <button
-                    className={`pb-4 font-bold text-lg transition-all relative ${activeTab === 'notes' ? 'text-primary' : 'text-muted'}`}
-                    onClick={() => setActiveTab('notes')}
-                >
-                    Notes
-                    {activeTab === 'notes' && (
-                        <div className="absolute bottom-0 left-0 w-full h-0.5 rounded-t-full" style={{ backgroundColor: 'var(--primary)' }} />
-                    )}
-                </button>
-                <button
-                    className={`pb-4 font-bold text-lg transition-all relative ${activeTab === 'tags' ? 'text-primary' : 'text-muted'}`}
-                    onClick={() => setActiveTab('tags')}
-                >
-                    Tags
-                    {activeTab === 'tags' && (
-                        <div className="absolute bottom-0 left-0 w-full h-0.5 rounded-t-full" style={{ backgroundColor: 'var(--primary)' }} />
-                    )}
-                </button>
+            <div className="flex gap-8" style={{ borderBottom: '1px solid var(--border)' }}>
+                {tabs.map(tab => (
+                    <button
+                        key={tab.id}
+                        className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
+                        onClick={() => setActiveTab(tab.id)}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
             </div>
 
             {/* Tab Content */}
-            <div className="min-h-[300px]">
+            <div style={{ minHeight: '300px' }} className="animate-fade-in" key={activeTab}>
                 {activeTab === 'overview' && (
-                    <div className="flex flex-col gap-4">
-                        <Card className="p-8">
-                            <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
-                                <StickyNote size={20} className="text-primary" /> Quick Summary
-                            </h3>
-                            <p className="text-muted text-lg leading-relaxed">{candidate.notesSummary || "No summary added yet."}</p>
-                        </Card>
-                    </div>
+                    <Card className="p-8" hoverable={false}>
+                        <h3 className="font-bold text-lg flex items-center gap-2" style={{ marginBottom: '1rem' }}>
+                            <StickyNote size={18} style={{ color: 'var(--primary)' }} /> Quick Summary
+                        </h3>
+                        <p className="text-muted" style={{ fontSize: '1.05rem', lineHeight: 1.7 }}>
+                            {candidate.notesSummary || "No summary added yet. Add one when editing the candidate."}
+                        </p>
+                    </Card>
                 )}
 
                 {activeTab === 'interactions' && (
                     <div className="flex flex-col gap-8">
-                        <Card className="flex flex-col gap-4 bg-slate-50 border-none shadow-inner" style={{ backgroundColor: 'var(--bg-app)' }}>
-                            <h3 className="font-bold text-sm uppercase text-muted tracking-wider">Log New Interaction</h3>
-                            <div className="flex gap-4">
+                        {/* Add Interaction Form */}
+                        <Card hoverable={false} style={{ backgroundColor: 'var(--bg-app)', border: '1px dashed var(--border)' }}>
+                            <h3 className="font-bold text-sm text-muted" style={{ textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.75rem' }}>
+                                Log New Interaction
+                            </h3>
+                            <div className="flex gap-4" style={{ marginBottom: '0.75rem' }}>
                                 <select
-                                    className="p-3 rounded-lg border bg-white flex-1"
+                                    className="flex-1"
                                     value={interactionType}
                                     onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setInteractionType(e.target.value as any)}
-                                    style={{ borderColor: 'var(--border)' }}
+                                    style={{ borderColor: 'var(--border)', borderRadius: 'var(--radius)', padding: '0.625rem 0.875rem' }}
                                 >
-                                    <option value="chat">Chat</option>
-                                    <option value="call">Call</option>
-                                    <option value="date">Date</option>
+                                    <option value="chat">💬 Chat</option>
+                                    <option value="call">📞 Call</option>
+                                    <option value="date">📅 Date</option>
                                 </select>
                                 <input
                                     type="datetime-local"
-                                    className="p-3 rounded-lg border bg-white flex-1"
+                                    className="flex-1"
                                     value={interactionDate}
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInteractionDate(e.target.value)}
-                                    style={{ borderColor: 'var(--border)' }}
+                                    style={{ borderColor: 'var(--border)', borderRadius: 'var(--radius)', padding: '0.625rem 0.875rem' }}
                                 />
                             </div>
                             <TextArea
@@ -201,87 +208,128 @@ export function CandidateDetail({ candidateId, onBack }: CandidateDetailProps) {
                                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInteractionSummary(e.target.value)}
                                 style={{ minHeight: '80px', backgroundColor: 'white' }}
                             />
-                            <Button size="md" onClick={handleAddInteraction} className="self-end shadow-md">Add Log</Button>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.75rem' }}>
+                                <Button size="md" onClick={handleAddInteraction}>Add Log</Button>
+                            </div>
                         </Card>
 
-                        <div className="flex flex-col gap-6 pl-4 border-l-2 border-slate-200" style={{ borderColor: 'var(--border)' }}>
-                            {interactions.map(interaction => (
-                                <div key={interaction.id} className="flex gap-6 relative">
-                                    <div className="absolute -left-[25px] top-1 w-4 h-4 rounded-full border-4 border-white shadow-sm"
-                                        style={{ backgroundColor: 'var(--primary)' }}></div>
-                                    <div className="pb-2 w-full">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <Badge variant="outline">{interaction.type}</Badge>
-                                            <span className="text-sm text-muted font-medium">{formatDateTime(interaction.date)}</span>
+                        {/* Timeline */}
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '1.5rem',
+                            paddingLeft: '1.5rem',
+                            borderLeft: '2px solid var(--border)',
+                            position: 'relative',
+                        }}>
+                            {interactions.map(interaction => {
+                                const InteractionIcon = INTERACTION_ICONS[interaction.type] || MessageSquare;
+                                return (
+                                    <div key={interaction.id} style={{ position: 'relative' }}>
+                                        {/* Timeline dot */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            left: '-2rem',
+                                            top: '0.5rem',
+                                            width: '16px',
+                                            height: '16px',
+                                            borderRadius: '50%',
+                                            backgroundColor: 'var(--primary)',
+                                            border: '3px solid var(--bg-card)',
+                                            boxShadow: 'var(--shadow-sm)',
+                                        }} />
+                                        <div style={{ marginBottom: '0.5rem' }}>
+                                            <div className="flex items-center gap-3" style={{ marginBottom: '0.5rem' }}>
+                                                <Badge variant="outline" size="sm">
+                                                    <InteractionIcon size={12} style={{ marginRight: '2px' }} />{interaction.type}
+                                                </Badge>
+                                                <span className="text-sm text-muted font-medium">{formatDateTime(interaction.date)}</span>
+                                            </div>
+                                            <Card className="p-4" hoverable={false}>
+                                                <p style={{ fontSize: '0.95rem', lineHeight: 1.6 }}>{interaction.summary}</p>
+                                            </Card>
                                         </div>
-                                        <Card className="p-4 bg-white shadow-sm">
-                                            <p className="text-base">{interaction.summary}</p>
-                                        </Card>
                                     </div>
-                                </div>
-                            ))}
-                            {interactions.length === 0 && <p className="text-muted italic pl-2">No interactions logged yet.</p>}
+                                );
+                            })}
+                            {interactions.length === 0 && (
+                                <p className="text-muted italic" style={{ paddingLeft: '0.5rem' }}>No interactions logged yet.</p>
+                            )}
                         </div>
                     </div>
                 )}
 
                 {activeTab === 'notes' && (
-                    <div className="flex flex-col gap-8">
+                    <div className="flex flex-col gap-6">
+                        {/* Add Note */}
                         <div className="flex gap-4 items-start">
                             <TextArea
                                 placeholder="Add a private note..."
                                 value={newNote}
                                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewNote(e.target.value)}
-                                className="flex-1 shadow-sm"
+                                className="flex-1"
                                 style={{ minHeight: '100px' }}
                             />
-                            <Button onClick={handleAddNote} className="h-12 px-6 shadow-md">Add Note</Button>
+                            <Button onClick={handleAddNote} style={{ height: '48px', padding: '0 1.5rem' }}>Add Note</Button>
                         </div>
 
-                        <div className="grid gap-4">
+                        {/* Notes List */}
+                        <div className="flex flex-col gap-4">
                             {notes.map(note => (
-                                <Card key={note.id} className="bg-yellow-50 border-yellow-100" style={{ backgroundColor: '#FEFCE8', borderColor: '#FEF9C3' }}>
-                                    <p className="whitespace-pre-wrap text-lg text-slate-800">{note.content}</p>
-                                    <p className="text-xs text-muted mt-4 text-right font-medium">{formatDateTime(note.createdAt)}</p>
-                                </Card>
+                                <div key={note.id} style={{
+                                    padding: '1.25rem 1.5rem',
+                                    borderRadius: 'var(--radius-lg)',
+                                    backgroundColor: '#FEFCE8',
+                                    border: '1px solid #FEF3C7',
+                                    borderLeft: '4px solid #F59E0B',
+                                    transition: 'var(--transition)',
+                                }}>
+                                    <p style={{ whiteSpace: 'pre-wrap', fontSize: '0.95rem', lineHeight: 1.6, color: '#44403C' }}>{note.content}</p>
+                                    <p className="text-xs text-muted font-medium" style={{ marginTop: '0.75rem', textAlign: 'right' }}>
+                                        {formatDateTime(note.createdAt)}
+                                    </p>
+                                </div>
                             ))}
-                            {notes.length === 0 && <p className="text-muted italic">No notes yet.</p>}
+                            {notes.length === 0 && <p className="text-muted italic">No notes yet. Add your first note above.</p>}
                         </div>
                     </div>
                 )}
 
                 {activeTab === 'tags' && (
-                    <div className="flex flex-col gap-6">
-                        <Card className="p-8">
-                            <h3 className="font-bold text-xl mb-6">Manage Tags</h3>
-                            <div className="flex flex-wrap gap-3">
-                                {data.tags.map(tag => {
-                                    const isSelected = candidate.tags.some(t => t.id === tag.id);
-                                    return (
-                                        <button
-                                            key={tag.id}
-                                            onClick={() => {
-                                                const newTags = isSelected
-                                                    ? candidate.tags.filter(t => t.id !== tag.id)
-                                                    : [...candidate.tags, tag];
-                                                updateCandidate(candidate.id, { tags: newTags });
-                                            }}
-                                            className="transition-all duration-200 hover:scale-105"
-                                            style={{ opacity: isSelected ? 1 : 0.5 }}
+                    <Card className="p-8" hoverable={false}>
+                        <h3 className="font-bold text-lg" style={{ marginBottom: '1.25rem' }}>Manage Tags</h3>
+                        <p className="text-sm text-muted" style={{ marginBottom: '1rem' }}>Click a tag to toggle it on or off for this candidate.</p>
+                        <div className="flex flex-wrap gap-3">
+                            {data.tags.map(tag => {
+                                const isSelected = candidate.tags.some(t => t.id === tag.id);
+                                return (
+                                    <button
+                                        key={tag.id}
+                                        onClick={() => {
+                                            const newTags = isSelected
+                                                ? candidate.tags.filter(t => t.id !== tag.id)
+                                                : [...candidate.tags, tag];
+                                            updateCandidate(candidate.id, { tags: newTags });
+                                        }}
+                                        style={{
+                                            transition: 'var(--transition-spring)',
+                                            opacity: isSelected ? 1 : 0.45,
+                                            transform: isSelected ? 'scale(1.08)' : 'scale(1)',
+                                            cursor: 'pointer',
+                                        }}
+                                    >
+                                        <Badge
+                                            color={tag.color}
+                                            variant={isSelected ? 'solid' : 'outline'}
+                                            size="md"
                                         >
-                                            <Badge
-                                                color={tag.color}
-                                                variant={isSelected ? 'solid' : 'outline'}
-                                                className="text-lg py-2 px-4 cursor-pointer"
-                                            >
-                                                {tag.label}
-                                            </Badge>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </Card>
-                    </div>
+                                            {isSelected ? '✓ ' : ''}{tag.label}
+                                        </Badge>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </Card>
                 )}
             </div>
         </div>

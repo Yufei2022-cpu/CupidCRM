@@ -5,6 +5,7 @@ import { TextArea } from './Input';
 import { Select } from './Select';
 import { Badge } from './Badge';
 import { Button } from './Button';
+import { User, MapPin, Briefcase, MessageSquare } from 'lucide-react';
 
 interface CandidateFormProps {
     initialData?: Partial<Candidate>;
@@ -42,17 +43,21 @@ export function CandidateForm({ initialData, availableTags, onSubmit, onCancel }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6 p-2">
-            <div className="grid grid-cols-2 gap-6">
-                <Input
-                    label="Name"
-                    value={formData.name}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    required
-                    placeholder="e.g. Sarah Jenkins"
-                />
-
-                <div className="flex flex-col gap-1.5">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            {/* Section: Basic Info */}
+            <div>
+                <div className="flex items-center gap-2" style={{ marginBottom: '1rem' }}>
+                    <User size={16} style={{ color: 'var(--primary)' }} />
+                    <span className="font-semibold text-sm" style={{ color: 'var(--text-main)', letterSpacing: '0.03em', textTransform: 'uppercase' }}>Basic Info</span>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <Input
+                        label="Name"
+                        value={formData.name}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                        required
+                        placeholder="e.g. Sarah Jenkins"
+                    />
                     <Select
                         label="Status"
                         value={formData.status}
@@ -68,43 +73,65 @@ export function CandidateForm({ initialData, availableTags, onSubmit, onCancel }
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
-                <div className="flex gap-4">
+            {/* Section: Details */}
+            <div>
+                <div className="flex items-center gap-2" style={{ marginBottom: '1rem' }}>
+                    <MapPin size={16} style={{ color: 'var(--primary)' }} />
+                    <span className="font-semibold text-sm" style={{ color: 'var(--text-main)', letterSpacing: '0.03em', textTransform: 'uppercase' }}>Details</span>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="flex gap-3">
+                        <Input
+                            label="Age"
+                            type="number"
+                            value={formData.age}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, age: e.target.value }))}
+                            style={{ width: '45%' }}
+                            placeholder="25"
+                        />
+                        <Input
+                            label="City"
+                            value={formData.city}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                            style={{ flex: 1 }}
+                            placeholder="e.g. New York"
+                        />
+                    </div>
                     <Input
-                        label="Age"
-                        type="number"
-                        value={formData.age}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, age: e.target.value }))}
-                        className="w-1/3"
-                        placeholder="25"
-                    />
-                    <Input
-                        label="City"
-                        value={formData.city}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                        className="flex-1"
-                        placeholder="e.g. New York"
+                        label="Job / Occupation"
+                        value={formData.job}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, job: e.target.value }))}
+                        placeholder="e.g. Product Designer"
                     />
                 </div>
+            </div>
 
-                <Input
-                    label="Job / Occupation"
-                    value={formData.job}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, job: e.target.value }))}
-                    placeholder="e.g. Product Designer"
+            {/* Section: Summary */}
+            <div>
+                <div className="flex items-center gap-2" style={{ marginBottom: '1rem' }}>
+                    <MessageSquare size={16} style={{ color: 'var(--primary)' }} />
+                    <span className="font-semibold text-sm" style={{ color: 'var(--text-main)', letterSpacing: '0.03em', textTransform: 'uppercase' }}>Quick Summary</span>
+                </div>
+                <TextArea
+                    value={formData.notesSummary}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, notesSummary: e.target.value }))}
+                    placeholder="First impressions, interests, vibe..."
+                    style={{ minHeight: '90px' }}
                 />
             </div>
 
-            <TextArea
-                label="Quick Summary"
-                value={formData.notesSummary}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData(prev => ({ ...prev, notesSummary: e.target.value }))}
-                placeholder="First impressions, interests, vibe..."
-            />
-
-            <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-muted ml-1">Tags</label>
-                <div className="flex flex-wrap gap-2 p-4 rounded-lg border border-dashed" style={{ borderColor: 'var(--border)' }}>
+            {/* Section: Tags */}
+            <div>
+                <div className="flex items-center gap-2" style={{ marginBottom: '0.75rem' }}>
+                    <Briefcase size={16} style={{ color: 'var(--primary)' }} />
+                    <span className="font-semibold text-sm" style={{ color: 'var(--text-main)', letterSpacing: '0.03em', textTransform: 'uppercase' }}>Tags</span>
+                </div>
+                <div className="flex flex-wrap gap-2" style={{
+                    padding: '1rem',
+                    borderRadius: 'var(--radius)',
+                    border: '1px dashed var(--border)',
+                    backgroundColor: 'var(--bg-app)',
+                }}>
                     {availableTags.map(tag => {
                         const isSelected = formData.tags.some(t => t.id === tag.id);
                         return (
@@ -113,13 +140,13 @@ export function CandidateForm({ initialData, availableTags, onSubmit, onCancel }
                                 type="button"
                                 onClick={() => toggleTag(tag)}
                                 style={{
-                                    opacity: isSelected ? 1 : 0.6,
+                                    opacity: isSelected ? 1 : 0.5,
                                     transform: isSelected ? 'scale(1.05)' : 'scale(1)',
-                                    transition: 'all 0.2s'
+                                    transition: 'var(--transition-spring)',
                                 }}
                             >
-                                <Badge color={tag.color} variant={isSelected ? 'solid' : 'outline'}>
-                                    {tag.label}
+                                <Badge color={tag.color} variant={isSelected ? 'solid' : 'outline'} size="md">
+                                    {isSelected ? '✓ ' : ''}{tag.label}
                                 </Badge>
                             </button>
                         );
@@ -127,9 +154,14 @@ export function CandidateForm({ initialData, availableTags, onSubmit, onCancel }
                 </div>
             </div>
 
-            <div className="flex justify-end gap-3 mt-6 pt-6 border-t" style={{ borderColor: 'var(--border)' }}>
+            {/* Actions */}
+            <div className="flex justify-end gap-3" style={{
+                marginTop: '0.5rem',
+                paddingTop: '1.25rem',
+                borderTop: '1px solid var(--border)',
+            }}>
                 <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
-                <Button type="submit" className="shadow-md">Save Candidate</Button>
+                <Button type="submit">Save Candidate</Button>
             </div>
         </form>
     );

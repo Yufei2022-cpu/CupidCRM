@@ -4,29 +4,14 @@ interface CardProps {
     children: React.ReactNode;
     className?: string;
     style?: React.CSSProperties;
+    hoverable?: boolean;
 }
 
-export function Card({ children, className = '', style }: CardProps) {
+export function Card({ children, className = '', style, hoverable = true }: CardProps) {
     return (
         <div
-            className={`p-6 rounded-lg ${className}`}
-            style={{
-                backgroundColor: 'var(--bg-card)',
-                boxShadow: 'var(--shadow-sm)',
-                border: '1px solid var(--border)',
-                transition: 'var(--transition)',
-                ...style
-            }}
-            onMouseEnter={e => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
-                e.currentTarget.style.borderColor = 'var(--border-hover)';
-            }}
-            onMouseLeave={e => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
-                e.currentTarget.style.borderColor = 'var(--border)';
-            }}
+            className={`card-base ${hoverable ? 'card-hoverable' : ''} p-6 ${className}`}
+            style={style}
         >
             {children}
         </div>
